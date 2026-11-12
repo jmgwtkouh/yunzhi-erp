@@ -1,0 +1,19 @@
+# 运行时数据与日志（首次运行自动生成）
+ERPServer/data/*
+!ERPServer/data/.gitkeep
+ERPServer/logs/*
+!ERPServer/logs/.gitkeep
+ERPServer/app/__pycache__/
+__pycache__/
+*.pyc
+
+# Xcode
+ERPiOS/DerivedData/
+ERPiOS/build/
+*.xcuserdata/
+xcuserdata/
+.DS_Store
+
+# 本地个人配置
+ERPServer/runtime/
+ERPServer/app/web/earth-bg.js

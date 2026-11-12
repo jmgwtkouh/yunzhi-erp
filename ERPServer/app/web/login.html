@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>登录 · 云智 ERP</title>
+<style>
+:root{
+  --ink:#000000;            /* 主文字 · 纯黑 */
+  --ink-soft:#1c1c1e;
+  --muted:#45454d;          /* 辅助文字 · 深灰（仍清晰） */
+  --faint:#6b6b75;          /* 弱化文字 */
+  --brand:#3b4ff0;
+  --brand2:#6d4ef2;
+  --ok:#0f9d76; --bad:#d0342c;
+  --glass-fill-a:rgba(255,255,255,.86);
+  --glass-fill-b:rgba(255,255,255,.62);
+  --hairline:rgba(17,24,60,.10);
+  --radius-card:24px; --radius-field:12px; --radius-btn:12px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;min-height:100vh;color:var(--ink);overflow-x:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  /* 白底：纯白为主，只在四角留极淡的冷色光，给玻璃一点可折射的内容 */
+  background:
+    radial-gradient(640px 540px at 8% 4%, #e9eeff 0%, rgba(233,238,255,0) 62%),
+    radial-gradient(560px 480px at 96% 96%, #f1ecff 0%, rgba(241,236,255,0) 66%),
+    radial-gradient(520px 460px at 92% 2%, #edf3ff 0%, rgba(237,243,255,0) 60%),
+    linear-gradient(180deg,#ffffff 0%,#fdfdfe 48%,#f6f7fb 100%);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* ===== 悬浮玻璃球（白底上的柔和色块，压到画面四角） ===== */
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;will-change:transform}
+.orb::after{content:"";position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.9),rgba(255,255,255,0) 46%)}
+.orb-blue{
+  background:radial-gradient(circle at 33% 28%,#eaf0ff 0%,#c2d0ff 34%,#8fa6fb 72%,#7d96f8 100%);
+  box-shadow:0 26px 54px rgba(80,104,220,.16),inset -14px -18px 40px rgba(70,90,200,.14);}
+.orb-purple{
+  background:radial-gradient(circle at 33% 28%,#f3edff 0%,#dccfff 34%,#b79cf8 72%,#a98cf6 100%);
+  box-shadow:0 24px 48px rgba(120,90,220,.14),inset -13px -16px 38px rgba(110,80,200,.12);}
+
+.orb.o1{width:clamp(44px,4.6vw,64px);height:clamp(44px,4.6vw,64px);
+  left:6%;top:14%;animation:drift 15s ease-in-out infinite}
+.orb.o2{width:clamp(120px,15vw,210px);height:clamp(120px,15vw,210px);
+  right:-6%;top:4%;animation:drift 23s ease-in-out infinite -4s}
+.orb.o3{width:clamp(230px,30vw,420px);height:clamp(230px,30vw,420px);
+  left:2%;bottom:-18%;animation:drift 31s ease-in-out infinite -11s}
+.orb.o4{width:clamp(78px,9vw,132px);height:clamp(78px,9vw,132px);
+  right:12%;bottom:8%;animation:drift 19s ease-in-out infinite -7s}
+.orb.o5{width:clamp(38px,4vw,56px);height:clamp(38px,4vw,56px);
+  left:24%;top:6%;animation:drift 17s ease-in-out infinite -2s}
+
+/* 不是简单上下浮动：位移 + 轻微缩放一起，轨迹是不规则的有机漂移 */
+@keyframes drift{
+  0%  {transform:translate3d(0,0,0) scale(1)}
+  22% {transform:translate3d(14px,-22px,0) scale(1.03)}
+  45% {transform:translate3d(-8px,-34px,0) scale(.975)}
+  68% {transform:translate3d(-18px,-12px,0) scale(1.025)}
+  85% {transform:translate3d(6px,6px,0) scale(.99)}
+  100%{transform:translate3d(0,0,0) scale(1)}
+}
+
+/* ===== 白底磨砂玻璃卡片 ===== */
+.stage{position:relative;z-index:3;min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:clamp(22px,4.5vw,60px);
+  padding-left:max(clamp(22px,4.5vw,60px),env(safe-area-inset-left));
+  padding-right:max(clamp(22px,4.5vw,60px),env(safe-area-inset-right));
+  padding-top:max(clamp(22px,4.5vw,60px),env(safe-area-inset-top));
+  padding-bottom:max(clamp(22px,4.5vw,60px),env(safe-area-inset-bottom));}
+
+.card{position:relative;isolation:isolate;flex:0 1 auto;max-width:100%;min-width:0;
+  width:min(408px,100%);padding:36px 32px 26px;border-radius:var(--radius-card);
+  background:linear-gradient(158deg,var(--glass-fill-a) 0%,var(--glass-fill-b) 52%,rgba(255,255,255,.72) 100%);
+  border:1px solid rgba(255,255,255,.9);
+  backdrop-filter:blur(30px) saturate(135%);
+  -webkit-backdrop-filter:blur(30px) saturate(135%);
+  box-shadow:
+    0 0 0 1px rgba(17,24,60,.045),
+    0 34px 64px -26px rgba(22,30,72,.22),
+    0 10px 22px -12px rgba(22,30,72,.10),
+    inset 0 1px 0 rgba(255,255,255,1),
+    inset 0 -1px 0 rgba(255,255,255,.7);
+  animation:rise .7s cubic-bezier(.2,.8,.25,1) both}
+/* 玻璃边缘折射：左上亮、右下略暗，白色描边勾出厚度 */
+.card::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
+  background:linear-gradient(150deg,
+    rgba(255,255,255,1) 0%,rgba(255,255,255,.55) 30%,
+    rgba(255,255,255,.18) 58%,rgba(255,255,255,.55) 84%,
+    rgba(255,255,255,.95) 100%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  pointer-events:none;z-index:2}
+/* 顶部一道极细镜面高光 */
+.card::after{content:"";position:absolute;left:12%;right:12%;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,1),transparent);
+  pointer-events:none;z-index:2}
+@media (min-width:1024px){ .card{transform:translateX(6vw)} }
+
+/* 品牌标识 */
+.brand{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:20px}
+.logo{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;
+  background:linear-gradient(135deg,#4c82ff,#8b5cf6);
+  box-shadow:0 12px 24px rgba(70,110,250,.28),inset 0 1px 0 rgba(255,255,255,.42)}
+.logo svg{width:24px;height:24px}
+.brand b{display:block;font-size:15.5px;letter-spacing:.6px;font-weight:700;color:var(--ink)}
+.brand small{display:block;margin-top:3px;font-size:9.5px;letter-spacing:1.8px;
+  color:var(--faint);text-transform:uppercase;font-weight:600}
+
+.head{text-align:center;margin-bottom:20px}
+.head h2{margin:0 0 6px;font-size:24px;font-weight:800;letter-spacing:.2px;color:var(--ink)}
+.head .sub{margin:0;font-size:13px;font-weight:500;color:var(--muted)}
+
+.status{display:flex;justify-content:center;margin-bottom:20px}
+.status span{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:600;color:#2f2f36;
+  padding:6px 13px;border-radius:999px;background:rgba(255,255,255,.78);
+  border:1px solid rgba(17,24,60,.10);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,1),0 1px 3px rgba(17,24,60,.05)}
+.status .mini{width:6px;height:6px;border-radius:50%;background:#e0a020}
+.status .mini.ok{background:var(--ok)}.status .mini.bad{background:var(--bad)}
+
+label{display:block;font-size:12px;font-weight:700;color:var(--ink);margin:0 0 7px;letter-spacing:.2px}
+.inputbox{position:relative;margin-bottom:15px}
+.inputbox svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;
+  color:#5f6070;pointer-events:none}
+.field{width:100%;border:1px solid var(--hairline);border-radius:var(--radius-field);
+  padding:13px 13px 13px 39px;font-size:14.5px;font-weight:500;color:var(--ink);outline:none;
+  background:rgba(255,255,255,.92);transition:border-color .16s,box-shadow .16s,background .16s}
+.field::placeholder{color:#83838d;font-weight:400}
+.field:hover{border-color:rgba(17,24,60,.18);background:#fff}
+.field:focus{border-color:var(--brand);background:#fff;
+  box-shadow:0 0 0 3.5px rgba(59,79,240,.14)}
+.pwbox .field{padding-right:60px}
+.toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:none;
+  color:#3a3a44;font-size:12px;font-weight:600;cursor:pointer;padding:7px 9px;border-radius:7px}
+.toggle:hover{color:var(--brand);background:rgba(59,79,240,.08)}
+
+.btn{position:relative;overflow:hidden;width:100%;border:0;border-radius:var(--radius-btn);
+  padding:14px;font-size:14.5px;font-weight:700;letter-spacing:2px;color:#fff;cursor:pointer;margin-top:6px;
+  background:linear-gradient(100deg,#3b4ff0,#6d4ef2);
+  box-shadow:0 14px 26px -8px rgba(59,79,240,.45),inset 0 1px 0 rgba(255,255,255,.30);
+  transition:transform .16s,box-shadow .16s,filter .16s}
+.btn::after{content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.26),transparent);
+  transform:skewX(-20deg);animation:sweep 5.5s ease-in-out infinite}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.05);
+  box-shadow:0 18px 32px -8px rgba(59,79,240,.5)}
+.btn:active{transform:translateY(0);filter:brightness(.97)}
+.btn:disabled{opacity:.6;cursor:default;transform:none}
+.err{background:#fdecea;border:1px solid #f3c4c0;color:#a52a20;
+  border-radius:10px;padding:10px 12px;font-size:12.5px;font-weight:500;margin-bottom:15px;display:none}
+.err.show{display:block;animation:rise .25s ease both}
+
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes sweep{0%,68%{left:-60%}100%{left:130%}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* 手机端 */
+@media (max-width:700px){
+  .orb.o2{right:-14%;top:1%;opacity:.9}
+  .orb.o3{left:-16%;bottom:-12%;opacity:.95}
+  .orb.o4{right:-6%;bottom:6%;opacity:.85}
+  .orb.o5{display:none}
+  .card{padding:32px 22px 26px;border-radius:22px}
+  .field{font-size:16px}   /* 触控键盘友好，避免 iOS 聚焦缩放 */
+}
+</style>
+</head>
+<body>
+<div class="orb orb-purple o1"></div>
+<div class="orb orb-blue o2"></div>
+<div class="orb orb-purple o3"></div>
+<div class="orb orb-blue o4"></div>
+<div class="orb orb-purple o5"></div>
+
+<div class="stage">
+  <div class="card">
+    <div class="brand">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.5 4 5.6 4 9s-1.4 6.5-4 9c-2.6-2.5-4-5.6-4-9s1.4-6.5 4-9z"/>
+        </svg>
+      </div>
+      <div style="text-align:center"><b>云智 ERP</b><small>Enterprise Resource Planning</small></div>
+    </div>
+
+    <div class="head">
+      <h2>欢迎回来</h2>
+      <p class="sub">登录以继续访问企业管理控制台</p>
+    </div>
+
+    <div class="status"><span><i class="mini" id="dot"></i><span id="srv">正在连接服务器...</span></span></div>
+    <div class="err" id="err"></div>
+
+    <form id="form" autocomplete="off">
+      <label for="u">用户名</label>
+      <div class="inputbox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c.9-3.6 3.8-5.6 7.5-5.6s6.6 2 7.5 5.6"/></svg>
+        <input class="field" id="u" name="username" placeholder="请输入用户名" autocomplete="username" required>
+      </div>
+      <label for="p">密码</label>
+      <div class="inputbox pwbox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4.5" y="10" width="15" height="10.5" rx="2.4"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+        <input class="field" id="p" name="password" type="password" placeholder="请输入密码" autocomplete="current-password" required>
+        <button class="toggle" type="button" id="eye">显示</button>
+      </div>
+      <button class="btn" id="submit" type="submit">登录</button>
+    </form>
+  </div>
+</div>
+
+<script>
+(function(){
+  var B=location.origin;
+
+  if(localStorage.getItem('erp_session')) location.replace('index.html');
+
+  var D=document.getElementById('dot'), S=document.getElementById('srv');
+  function setStatus(ok,text){
+    D.className='mini '+(ok?'ok':'bad');
+    S.textContent=text;
+  }
+  fetch(B+'/health',{cache:'no-store'}).then(function(r){return r.json();}).then(function(){
+    setStatus(true,'服务在线');
+  }).catch(function(){
+    setStatus(false,'服务离线');
+  });
+
+  document.getElementById('eye').onclick=function(){
+    var p=document.getElementById('p'), show=p.type==='password';
+    p.type=show?'text':'password';
+    document.getElementById('eye').textContent=show?'隐藏':'显示';
+  };
+
+  var err=document.getElementById('err');
+  function showErr(m){ err.textContent=m; err.classList.add('show'); }
+  document.getElementById('form').onsubmit=async function(e){
+    e.preventDefault(); err.classList.remove('show');
+    var btn=document.getElementById('submit'); btn.disabled=true; btn.textContent='登录中...';
+    try{
+      var r=await fetch(B+'/v1/auth/login',{method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({username:document.getElementById('u').value.trim(),
+                             password:document.getElementById('p').value})});
+      var d=await r.json();
+      if(!r.ok) throw new Error(d.message||'登录失败 ('+r.status+')');
+      localStorage.setItem('erp_session',d.token);
+      localStorage.setItem('erp_user',JSON.stringify(d.user||{}));
+      location.replace('index.html');
+    }catch(ex){ showErr(ex.message); btn.disabled=false; btn.textContent='登录'; }
+  };
+})();
+</script>
+</body>
+</html>

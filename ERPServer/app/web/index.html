@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>云智 ERP · 管理台</title>
+<style>
+:root{--brand:#2466eb;--brand-deep:#1742a4;--purple:#7b5ce8;--bg:#f4f6fb;--card:#fff;
+--line:#e6e9f0;--t1:#1b2333;--t2:#697386;--t3:#9aa3b2;--green:#12a05f;--orange:#e8900c;--red:#e0454b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t1);
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;font-size:13px}
+.app{display:flex;min-height:100vh}
+.side{width:218px;flex:0 0 218px;background:#111a2e;color:#c9d3e6;display:flex;flex-direction:column;
+position:sticky;top:0;height:100vh}
+.logo{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+.logo b{display:block;color:#fff;font-size:17px;letter-spacing:.3px}
+.logo span{font-size:10.5px;color:#7f8fae;letter-spacing:.6px}
+.nav{flex:1;overflow:auto;padding:14px 10px}
+.nav h4{font-size:10px;letter-spacing:1.3px;color:#65769a;margin:16px 12px 7px;font-weight:600}
+.nav button{width:100%;display:flex;align-items:center;gap:10px;border:0;background:none;color:#b9c6dd;
+padding:9px 12px;border-radius:9px;cursor:pointer;font-size:12.5px;text-align:left;margin-bottom:2px}
+.nav button:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav button.on{background:linear-gradient(90deg,var(--brand),#3d7bf5);color:#fff;font-weight:600}
+.nav .ic{width:17px;text-align:center;font-size:14px}
+.sidefoot{padding:14px 16px;border-top:1px solid rgba(255,255,255,.08);font-size:10.5px;color:#7f8fae;line-height:1.8}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:6px}
+.dot.off{background:var(--red)}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.top{height:62px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;
+padding:0 26px;gap:14px;position:sticky;top:0;z-index:5}
+.top h1{font-size:17px;margin:0;font-weight:650}
+.top .sub{font-size:11px;color:var(--t3);margin-top:2px}
+.spacer{flex:1}
+.pill{display:inline-flex;align-items:center;gap:6px;background:#f1f5fc;border:1px solid #e3eaf8;
+border-radius:999px;padding:6px 12px;font-size:11px;color:var(--t2)}
+.btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 13px;font-size:12px;
+color:var(--t2);cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--brand);color:var(--brand)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover{background:var(--brand-deep);color:#fff}
+.btn.mini{padding:5px 9px;font-size:11px;border-radius:7px}
+.view{padding:22px 26px 50px;max-width:1400px;width:100%}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;
+box-shadow:0 1px 3px rgba(24,40,80,.035)}
+.card h3{margin:0 0 14px;font-size:14px;font-weight:650}
+.card h3 small{font-size:11px;color:var(--t3);font-weight:400;margin-left:8px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:17px}
+.kpi .label{font-size:11.5px;color:var(--t2)}
+.kpi .val{font-size:27px;font-weight:750;letter-spacing:-.6px;margin-top:8px}
+.kpi .unit{font-size:11px;color:var(--t3);margin-left:4px;font-weight:400}
+.kpi .delta{font-size:11px;font-weight:650;margin-top:8px}
+.up{color:var(--green)}.down{color:var(--red)}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.tile{background:#f7f9fd;border:1px solid #edf1f8;border-radius:11px;padding:13px}
+.tile .n{font-size:19px;font-weight:700}.tile .l{font-size:11px;color:var(--t2);margin-top:3px}
+.bars{display:flex;align-items:flex-end;gap:7px;height:150px;margin-top:10px}
+.bars div{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+.bars i{display:block;width:100%;border-radius:4px 4px 2px 2px;
+background:linear-gradient(180deg,var(--brand),rgba(36,102,235,.35))}
+.bars span{font-size:9.5px;color:var(--t3)}
+.alert{background:#fff7e9;border:1px solid #f7e2bb;color:#8a5a08;border-radius:10px;
+padding:10px 13px;font-size:12px;margin-bottom:8px}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;font-size:10.5px;letter-spacing:.4px;color:var(--t3);font-weight:600;
+padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:11px 10px;border-bottom:1px solid #f0f2f7;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#fafbfe}
+.tbl .mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px;color:var(--t2)}
+.tbl .amt{font-weight:650;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl .right{text-align:right}
+.badge{font-size:10px;font-weight:650;padding:4px 9px;border-radius:999px;display:inline-block;white-space:nowrap}
+.b-gray{background:#eef0f4;color:#6c7484}.b-info{background:#e9f1ff;color:#2466eb}
+.b-ok{background:#e4f7ed;color:#0b8a4e}.b-warn{background:#fff2dc;color:#9a6206}
+.b-bad{background:#ffe9ea;color:#c93036}.b-purple{background:#efeaff;color:#6c4bd8}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.chip{border:1px solid var(--line);background:#fff;color:var(--t2);border-radius:999px;
+padding:6px 13px;font-size:11.5px;cursor:pointer}
+.chip.on{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}
+.search{border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:12px;width:230px;outline:none}
+.search:focus{border-color:var(--brand)}
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.toolbar .spacer{flex:1}
+.note{font-size:11.5px;color:var(--t2);line-height:1.8}
+.empty{text-align:center;padding:44px;color:var(--t3)}
+.loading{text-align:center;padding:60px;color:var(--t3)}
+.err{background:#fff0f0;border:1px solid #f6cfcf;color:#a52a2a;padding:16px;border-radius:12px;line-height:1.8}
+.rowline{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f2f7;font-size:12px}
+.rowline:last-child{border-bottom:none}.rowline span:first-child{color:var(--t2)}
+.prog{height:7px;border-radius:5px;background:#eef1f8;overflow:hidden;margin-top:7px}
+.prog i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--brand),#78a4ff)}
+.donut{width:132px;height:132px;border-radius:50%;flex:0 0 auto}
+.legend{flex:1}.legend .rowline{padding:6px 0}
+.field{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:12.5px;
+margin-bottom:11px;outline:none;background:#fff}
+.field:focus{border-color:var(--brand)}
+label.fl{display:block;font-size:11px;color:var(--t2);margin:0 0 5px}
+.toast{position:fixed;right:24px;bottom:24px;background:#1b2333;color:#fff;padding:12px 18px;
+border-radius:10px;font-size:12.5px;opacity:0;transform:translateY(10px);transition:.25s;z-index:50;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.42);z-index:40;display:none;align-items:center;justify-content:center}
+.modal.show{display:flex}
+.sheet{background:#fff;border-radius:16px;padding:24px;width:440px;max-height:86vh;overflow:auto}
+.sheet h3{margin:0 0 16px;font-size:16px}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11.5px;color:#33507f}
+.mono-list{line-height:2.1}
+@media(max-width:1000px){.side{width:64px;flex-basis:64px}.logo b,.logo span,.sidefoot,.nav h4,.nav button span{display:none}
+.nav button{justify-content:center}.grid4,.tiles{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="logo"><b>云智 ERP</b><span>REST v1 · 管理台</span></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="sidefoot">
+      <div><span class="dot" id="healthDot"></span><span id="healthText">连接中...</span></div>
+      <div id="srvAddr">—</div>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="top">
+      <div><h1 id="pageTitle">工作台</h1><div class="sub" id="pageSub">经营概览</div></div>
+      <div class="spacer"></div>
+      <span class="pill" id="authPill">👤 —</span>
+      <button class="btn" data-act="refresh">↻ 刷新</button>
+      <button class="btn" data-act="logout">退出</button>
+      <button class="btn primary" data-act="new-order">+ 新建销售订单</button>
+    </header>
+    <div class="view" id="view"><div class="loading">加载中...</div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+
+<script>
+if(!localStorage.getItem('erp_session')) location.replace('login.html');
+const NAV=[
+ ['概览',[['dashboard','工作台','▦','经营概览']]],
+ ['业务',[['sales','销售订单','📄','销售订单管理'],['purchases','采购订单','🛒','采购订单管理'],
+         ['inventory','库存查询','📦','实时库存'],['movements','出入库流水','⇄','库存变动记录'],
+         ['outbound','出库查找','🔎','仓储出库检索'],
+         ['production','生产工单','⚙','工单与报工'],['finance','应收应付','💴','往来结算']]],
+ ['基础资料',[['customers','客户','👥','客户档案'],['suppliers','供应商','🏢','供应商档案'],['products','商品','🧊','商品档案']]],
+ ['分析与系统',[['reports','报表中心','📊','经营分析'],['apidocs','接口文档','📚','REST v1 契约'],['settings','设置','⚙','服务与鉴权']]]
+];
+const TITLES={};NAV.forEach(g=>g[1].forEach(x=>TITLES[x[0]]={title:x[1],sub:x[3]}));
+const _qs=new URLSearchParams(location.search);
+const state={page:_qs.get('page')||'dashboard',filters:{},queries:{},token:localStorage.getItem('erp_token')||'',base:location.origin,
+ ob:{q:'',warehouse:'',date_from:'',date_to:'',operator:'',sku:''}};
+Object.keys(state.ob).forEach(k=>{if(_qs.has(k))state.ob[k]=_qs.get(k)});
+const $=id=>document.getElementById(id);
+const money=v=>'¥'+Number(v||0).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const num=v=>Number(v||0).toLocaleString('zh-CN');
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const stClass=s=>({'草稿':'b-gray','待审核':'b-warn','待审批':'b-warn','已确认':'b-info','已下单':'b-info',
+ '发货中':'b-purple','到货中':'b-purple','已完成':'b-ok','已入库':'b-ok','已结算':'b-ok','生产中':'b-info',
+ '质检中':'b-warn','待排产':'b-gray','已暂停':'b-bad','已取消':'b-bad','未结算':'b-warn',
+ '部分结算':'b-info','已逾期':'b-bad','入库':'b-ok','出库':'b-info','调拨':'b-purple'})[s]||'b-gray';
+const badge=s=>`<span class="badge ${stClass(s)}">${esc(s)}</span>`;
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');
+ clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
+async function api(path,opts={}){
+ const headers={'Content-Type':'application/json'};
+ const sess=localStorage.getItem('erp_session');
+ if(sess)headers.Authorization='Bearer '+sess;
+ else if(state.token)headers.Authorization='Bearer '+state.token;
+ const r=await fetch(state.base+path,{headers,...opts});
+ if(r.status===401){localStorage.removeItem('erp_session');localStorage.removeItem('erp_user');location.replace('login.html');throw new Error('登录已失效，请重新登录');}
+ if(!r.ok){let m='HTTP '+r.status;try{const j=await r.json();if(j.message)m=j.message}catch(e){}
+  throw new Error(m)}
+ return r.status===204?null:r.json();
+}
+const post=(p,b)=>api(p,{method:'POST',body:JSON.stringify(b)});
+const patch=(p,b)=>api(p,{method:'PATCH',body:JSON.stringify(b)});
+function chips(key,opts){const cur=state.filters[key]||'全部';
+ return `<div class="chips">${['全部',...opts].map(o=>`<button class="chip ${cur===o?'on':''}" data-act="filter" data-key="${key}" data-val="${esc(o)}">${esc(o)}</button>`).join('')}</div>`;}
+function searchBox(key,ph){return `<input class="search" data-search-key="${key}" placeholder="${ph}" value="${esc(state.queries[key]||'')}">`;}
+function applySearch(){const inp=document.querySelector('[data-search-key]');if(!inp)return;
+ const q=(state.queries[inp.dataset.searchKey]||'').trim().toLowerCase();
+ document.querySelectorAll('#view [data-search]').forEach(el=>{
+  el.style.display=(!q||el.dataset.search.toLowerCase().includes(q))?'':'none';});}
+
+function header(title,extra=''){return `<div class="toolbar"><div>${extra}</div><div class="spacer"></div>${searchBox(state.page,'搜索...')}</div>`;}
+function table(cols,rows){return `<div class="card" style="padding:0;overflow:auto"><table class="tbl">
+ <thead><tr>${cols.map(c=>`<th${c.right?' class="right"':''}>${c.t}</th>`).join('')}</tr></thead>
+ <tbody>${rows}</tbody></table>${rows?'':'<div class="empty">暂无数据</div>'}</div>`;}
+function bars(points,color){if(!points.length)return '<div class="empty">暂无数据</div>';const max=Math.max(...points.map(p=>p.value),1);
+ return `<div class="bars">${points.map(p=>`<div><i style="height:${Math.round(p.value/max*124)}px;${color?'background:linear-gradient(180deg,'+color+','+color+'55)':''}"></i><span>${esc(p.label)}</span></div>`).join('')}</div>`;}
+function donut(list){if(!list.length)return '<div class="donut" style="background:#eef1f8"></div>';let a=0;const seg=list.map(x=>{const c={'info':'#2466eb','accent':'#7b5ce8','success':'#12a05f','warning':'#e8900c','neutral':'#9aa3b2'}[x.tone]||'#2466eb';
+ const s=`${c} ${a}% ${a+x.value}%`;a+=x.value;return s;}).join(',');
+ return `<div class="donut" style="background:conic-gradient(${seg})"></div>`;}
+function legend(list){return `<div class="legend">${list.map(x=>`<div class="rowline"><span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;background:${({'info':'#2466eb','accent':'#7b5ce8','success':'#12a05f','warning':'#e8900c','neutral':'#9aa3b2'})[x.tone]||'#2466eb'}"></i>${esc(x.name)}</span><span>${x.value}%</span></div>`).join('')}</div>`;}
+
+// ---------- 页面 ----------
+async function pDashboard(){
+ const d=await api('/v1/dashboard/summary');
+ return `<div class="grid4">${d.kpis.map(k=>`<div class="kpi"><div class="label">${esc(k.title)}</div>
+  <div class="val">${esc(k.value)}<span class="unit">${esc(k.unit)}</span></div>
+  <div class="delta ${k.delta>=0?'up':'down'}">${k.delta>=0?'▲':'▼'} ${Math.abs(k.delta).toFixed(1)}% 较上月</div></div>`).join('')}</div>
+  <div class="grid2"><div class="card"><h3>待办事项<small>需要处理的单据</small></h3>
+   <div class="tiles">${d.todos.map(t=>`<div class="tile"><div class="n">${t.count}</div><div class="l">${esc(t.title)}</div></div>`).join('')}</div>
+   <h3 style="margin-top:20px">异常提醒</h3>${d.alerts.map(a=>`<div class="alert">⚠ ${esc(a)}</div>`).join('')}</div>
+   <div class="card"><h3>近 12 个月销售趋势<small>单位：万元</small></h3>${bars(d.salesTrend)}</div></div>
+  <div class="card"><h3>最近订单</h3>${table([{t:'单号'},{t:'客户'},{t:'日期'},{t:'负责人'},{t:'状态'},{t:'金额',right:true}],
+   d.recentOrders.map(o=>`<tr data-search="${esc(o.code+o.customerName)}"><td class="mono">${esc(o.code)}</td>
+   <td>${esc(o.customerName)}</td><td>${esc(o.date)}</td><td>${esc(o.owner)}</td><td>${badge(o.status)}</td>
+   <td class="right amt">${money(o.amount)}</td></tr>`).join(''))}</div>`;
+}
+async function pSales(){
+ const q=state.queries.sales||'',f=state.filters.sales||'全部';
+ const qs=new URLSearchParams();if(q)qs.set('q',q);if(f!=='全部')qs.set('status',f);
+ const rows=await api('/v1/sales-orders'+(qs.toString()?'?'+qs:''));
+ const total=rows.reduce((a,b)=>a+b.amount,0);
+ return `<div class="toolbar">${chips('sales',['草稿','待审核','已确认','发货中','已完成','已取消'])}
+   ${searchBox('sales','搜索单号或客户')}<div class="spacer"></div>
+   <span class="note">共 ${rows.length} 单 · 合计 <b>${money(total)}</b></span>
+   <button class="btn primary" data-act="new-order">+ 新建</button></div>`+
+ table([{t:'单号'},{t:'客户'},{t:'日期'},{t:'负责人'},{t:'状态'},{t:'金额',right:true},{t:'操作',right:true}],
+  rows.map(o=>`<tr data-search="${esc(o.code+o.customerName)}"><td class="mono">${esc(o.code)}</td>
+  <td>${esc(o.customerName)}</td><td>${esc(o.date)}</td><td>${esc(o.owner)}</td><td>${badge(o.status)}</td>
+  <td class="right amt">${money(o.amount)}</td>
+  <td class="right"><button class="btn mini" data-act="detail" data-kind="sales" data-id="${esc(o.id)}">详情</button>
+  <button class="btn mini" data-act="status" data-id="${esc(o.id)}" data-kind="sales">状态</button></td></tr>`).join(''));
+}
+async function pPurchases(){
+ const q=state.queries.purchases||'',f=state.filters.purchases||'全部';
+ const qs=new URLSearchParams();if(q)qs.set('q',q);if(f!=='全部')qs.set('status',f);
+ const rows=await api('/v1/purchase-orders'+(qs.toString()?'?'+qs:''));
+ return `<div class="toolbar">${chips('purchases',['草稿','待审批','已下单','到货中','已入库','已取消'])}
+  ${searchBox('purchases','搜索单号或供应商')}<div class="spacer"></div>
+  <span class="note">共 ${rows.length} 单 · 合计 <b>${money(rows.reduce((a,b)=>a+b.amount,0))}</b></span></div>`+
+ table([{t:'单号'},{t:'供应商'},{t:'下单日期'},{t:'预计到货'},{t:'状态'},{t:'金额',right:true},{t:'操作',right:true}],
+  rows.map(o=>`<tr data-search="${esc(o.code+o.supplierName)}"><td class="mono">${esc(o.code)}</td>
+  <td>${esc(o.supplierName)}</td><td>${esc(o.date)}</td><td>${esc(o.eta)}</td><td>${badge(o.status)}</td>
+  <td class="right amt">${money(o.amount)}</td><td class="right">
+  <button class="btn mini" data-act="detail" data-kind="purchase" data-id="${esc(o.id)}">详情</button>
+  <button class="btn mini" data-act="status" data-id="${esc(o.id)}" data-kind="purchase">状态</button></td></tr>`).join(''));
+}
+async function pInventory(){
+ const q=state.queries.inventory||'',low=state.filters.inventory==='仅看低库存';
+ const qs=new URLSearchParams();if(q)qs.set('q',q);if(low)qs.set('low_stock','true');
+ const rows=await api('/v1/inventory/items'+(qs.toString()?'?'+qs:''));
+ return `<div class="toolbar"><button class="chip ${low?'on':''}" data-act="filter" data-key="inventory" data-val="${low?'全部':'仅看低库存'}">${low?'✓ ':''}仅看低库存</button>
+  ${searchBox('inventory','搜索商品或 SKU')}<div class="spacer"></div><span class="note">共 ${rows.length} 条</span></div>`+
+ table([{t:'SKU'},{t:'商品'},{t:'仓库'},{t:'库存 / 安全库存'},{t:'水位'},{t:'更新'},{t:'操作',right:true}],
+  rows.map(i=>`<tr data-search="${esc(i.productName+i.sku)}"><td class="mono">${esc(i.sku)}</td>
+  <td>${esc(i.productName)}</td><td>${esc(i.warehouse)}</td>
+  <td class="amt">${num(i.quantity)} <span style="color:var(--t3);font-weight:400">/ ${num(i.safetyStock)}</span></td>
+  <td style="min-width:110px"><div class="prog"><i style="width:${Math.min(100,i.quantity/Math.max(1,i.safetyStock*3)*100)}%;${i.quantity<=i.safetyStock?'background:linear-gradient(90deg,#e0454b,#f09a9d)':''}"></i></div></td>
+  <td class="mono">${esc(i.updatedAt)}</td>
+  <td class="right"><button class="btn mini" data-act="adjust" data-id="${esc(i.id)}" data-val="-10">−10</button>
+  <button class="btn mini" data-act="adjust" data-id="${esc(i.id)}" data-val="10">+10</button></td></tr>`).join(''));
+}
+async function pMovements(){
+ const rows=await api('/v1/inventory/movements');
+ return `<div class="toolbar">${searchBox('movements','搜索商品或单号')}<div class="spacer"></div><span class="note">共 ${rows.length} 条流水</span></div>`+
+ table([{t:'单号'},{t:'商品'},{t:'类型'},{t:'数量',right:true},{t:'仓库'},{t:'日期'},{t:'操作人'}],
+  rows.map(m=>`<tr data-search="${esc(m.productName+m.code)}"><td class="mono">${esc(m.code)}</td>
+  <td>${esc(m.productName)}</td><td>${badge(m.type)}</td>
+  <td class="right amt" style="color:${m.type==='出库'?'var(--red)':'var(--green)'}">${m.type==='出库'?'-':'+'}${num(m.quantity)}</td>
+  <td>${esc(m.warehouse)}</td><td class="mono">${esc(m.date)}</td><td>${esc(m.operatorName)}</td></tr>`).join(''));
+}
+// ---------- 仓储出库查找 ----------
+function obQuery(){
+ const p=new URLSearchParams(),o=state.ob;
+ Object.keys(o).forEach(k=>{if(o[k])p.set(k,o[k])});
+ return '/v1/inventory/outbound/search'+(p.toString()?'?'+p:'');
+}
+function obCsv(){
+ const rows=state.obResult.items, head=['单号','SKU','商品','数量','单位','仓库','日期','经办人','领用方','备注'];
+ const cell=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+ const lines=[head.map(cell).join(',')].concat(rows.map(m=>[m.code,m.sku,m.productName,m.quantity,m.unit,m.warehouse,m.date,m.operatorName,m.receiver,m.note].map(cell).join(',')));
+ const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+ a.download='出库记录_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+ setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+}
+async function pOutbound(){
+ const d=await api(obQuery());state.obResult=d;
+ const o=state.ob,s=d.summary,opts=d.options;
+ const opt=(list,cur,ph)=>`<option value="">${ph}</option>`+list.map(v=>`<option value="${esc(v)}"${cur===v?' selected':''}>${esc(v)}</option>`).join('');
+ const kpi=(label,val,unit,color)=>`<div class="kpi"><div class="label">${label}</div><div class="val"${color?' style="color:'+color+'"':''}>${val}<span class="unit">${unit}</span></div></div>`;
+ const filterCard=`<div class="card"><h3>查找条件<small>支持关键词、仓库、日期区间、经办人、SKU 组合筛选</small></h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0 12px">
+   <div><label class="fl">关键词（单号/商品/领用方/备注）</label><input class="field" data-ob-key="q" value="${esc(o.q)}" placeholder="模糊搜索"></div>
+   <div><label class="fl">SKU / 商品编码</label><input class="field" data-ob-key="sku" value="${esc(o.sku)}" placeholder="如 SKU-A100"></div>
+   <div><label class="fl">仓库</label><select class="field" data-ob-key="warehouse">${opt(opts.warehouses,o.warehouse,'全部仓库')}</select></div>
+   <div><label class="fl">经办人</label><select class="field" data-ob-key="operator">${opt(opts.operators,o.operator,'全部经办人')}</select></div>
+   <div><label class="fl">起始日期</label><input class="field" type="date" data-ob-key="date_from" value="${esc(o.date_from)}"></div>
+   <div><label class="fl">截止日期</label><input class="field" type="date" data-ob-key="date_to" value="${esc(o.date_to)}"></div>
+  </div>
+  <div class="toolbar" style="margin:2px 0 0"><button class="btn primary" data-act="ob-search">🔎 查找</button>
+   <button class="btn" data-act="ob-reset">重置</button>
+   <button class="btn" data-act="ob-export">导出 CSV</button>
+   <div class="spacer"></div><button class="btn primary" data-act="ob-new">＋ 登记出库</button></div></div>`;
+ const rows=d.items.map(m=>`<tr><td class="mono">${esc(m.code)}</td>
+  <td class="mono">${esc(m.sku||'—')}</td><td>${esc(m.productName)}</td>
+  <td class="right amt" style="color:var(--red)">-${num(m.quantity)} <span style="color:var(--t3);font-weight:400">${esc(m.unit||'')}</span></td>
+  <td>${esc(m.warehouse||'—')}</td><td class="mono">${esc(m.date)}</td>
+  <td>${esc(m.operatorName||'—')}</td><td>${esc(m.receiver||'—')}</td>
+  <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(m.note||'')}">${esc(m.note||'—')}</td>
+  <td class="right">${m.photoUrl?`<button class="btn mini" data-act="ob-photo" data-val="${esc(m.photoUrl)}">照片</button>`:''}</td></tr>`).join('');
+ const whLine=s.warehouses.map(w=>`${esc(w.name)} ${num(w.quantity)}（${w.count} 单）`).join(' · ')||'—';
+ return `<div class="grid4">
+   ${kpi('命中出库单',num(s.count),'单')}
+   ${kpi('出库总量',num(s.totalQuantity),'件','var(--red)')}
+   ${kpi('涉及仓库',s.warehouses.length,'个')}
+   ${kpi('最近出库日',esc(s.latestDate||'—'),'','')}
+  </div>${filterCard}
+  <div class="card"><h3>仓库分布<small>${whLine}</small></h3>
+   <div class="note">共 ${num(d.total)} 条匹配${d.total>d.items.length?`，当前显示前 ${d.items.length} 条`:''}；数据来自服务端实时出库流水。</div></div>
+  ${table([{t:'单号'},{t:'SKU'},{t:'商品'},{t:'数量',right:true},{t:'仓库'},{t:'日期'},{t:'经办人'},{t:'领用方'},{t:'备注'},{t:'操作',right:true}],rows)}
+  ${d.total?'':'<div class="card note">暂无出库记录。可点击右上角「＋ 登记出库」创建第一笔出库单；也可在「库存查询」页用 −10 快速调整生成出库流水。</div>'}`;
+}
+async function showOutboundForm(){
+ let items=[];try{items=await api('/v1/inventory/items')}catch(e){}
+ const opts=items.filter(i=>Number(i.quantity)>0).map(i=>
+  `<option value="${esc(i.sku)}">${esc(i.sku)} · ${esc(i.productName)}（可用 ${num(i.quantity)} ${esc(i.unit||'')}）</option>`).join('');
+ openModal(`<h3>登记出库</h3>
+  <label class="fl">商品 SKU（仅有库存的商品）</label>
+  <select class="field" id="ob-sku">${opts||'<option value="">暂无可用库存，请先入库</option>'}</select>
+  <div style="display:flex;gap:10px"><div style="flex:1"><label class="fl">出库数量</label>
+   <input class="field" id="ob-qty" type="number" min="1" value="1"></div>
+  <div style="flex:1"><label class="fl">出库日期</label><input class="field" id="ob-date" type="date" value="${new Date().toISOString().slice(0,10)}"></div></div>
+  <div style="display:flex;gap:10px"><div style="flex:1"><label class="fl">仓库（留空取商品默认仓）</label>
+   <input class="field" id="ob-wh" placeholder="如 华东主仓"></div>
+  <div style="flex:1"><label class="fl">领用方 / 客户</label><input class="field" id="ob-receiver" placeholder="如 生产一车间"></div></div>
+  <label class="fl">备注</label><input class="field" id="ob-note" placeholder="用途说明（选填）">
+  <div style="margin-top:16px;text-align:right"><button class="btn" data-act="close-modal" style="margin-right:8px">取消</button>
+  <button class="btn primary" data-act="ob-submit"${opts?'':' disabled'}>确认出库</button></div>`);
+}
+async function pProduction(){
+ const f=state.filters.production||'全部';const qs=f!=='全部'?'?status='+encodeURIComponent(f):'';
+ const rows=await api('/v1/work-orders'+qs);
+ return `<div class="toolbar">${chips('production',['待排产','生产中','质检中','已完成','已暂停'])}
+  ${searchBox('production','搜索工单或商品')}<div class="spacer"></div><span class="note">共 ${rows.length} 张工单</span></div>`+
+ table([{t:'工单号'},{t:'产品'},{t:'产线'},{t:'进度'},{t:'交期'},{t:'状态'},{t:'操作',right:true}],
+  rows.filter(o=>{const q=(state.queries.production||'').toLowerCase();return !q||(o.code+o.productName).toLowerCase().includes(q)})
+  .map(o=>`<tr data-search="${esc(o.code+o.productName)}"><td class="mono">${esc(o.code)}</td>
+  <td>${esc(o.productName)}</td><td>${esc(o.line)}</td>
+  <td style="min-width:150px"><div class="note">${num(o.doneQty)} / ${num(o.planQty)} (${Math.round(o.doneQty/o.planQty*100)}%)</div>
+  <div class="prog"><i style="width:${o.doneQty/o.planQty*100}%"></i></div></td>
+  <td class="mono">${esc(o.dueDate)}</td><td>${badge(o.status)}</td>
+  <td class="right"><button class="btn mini" data-act="report" data-id="${esc(o.id)}" data-val="${o.doneQty+50}" ${o.status==='已完成'?'disabled':''}>报工 +50</button></td></tr>`).join(''));
+}
+async function pFinance(){
+ const typ=state.filters.financeType||'全部',st=state.filters.finance||'全部';
+ const qs=new URLSearchParams();if(typ!=='全部')qs.set('type',typ);if(st!=='全部')qs.set('status',st);
+ const rows=await api('/v1/invoices'+(qs.toString()?'?'+qs:''));
+ const remain=rows.reduce((a,b)=>a+b.amount-b.settled,0);
+ return `<div class="grid4" style="grid-template-columns:repeat(3,1fr)">
+  <div class="kpi"><div class="label">单据数</div><div class="val">${rows.length}<span class="unit">笔</span></div></div>
+  <div class="kpi"><div class="label">单据总额</div><div class="val">${(rows.reduce((a,b)=>a+b.amount,0)/10000).toFixed(1)}<span class="unit">万元</span></div></div>
+  <div class="kpi"><div class="label">未结金额</div><div class="val" style="color:var(--orange)">${(remain/10000).toFixed(1)}<span class="unit">万元</span></div></div></div>
+  <div class="toolbar">${chips('financeType',['应收','应付'])}${chips('finance',['未结算','部分结算','已结算','已逾期'])}
+  ${searchBox('finance','搜索单号或往来单位')}</div>`+
+ table([{t:'单号'},{t:'类型'},{t:'往来单位'},{t:'到期日'},{t:'状态'},{t:'金额',right:true},{t:'未结',right:true},{t:'操作',right:true}],
+  rows.filter(o=>{const q=(state.queries.finance||'').toLowerCase();return !q||(o.code+o.counterparty).toLowerCase().includes(q)})
+  .map(o=>`<tr data-search="${esc(o.code+o.counterparty)}"><td class="mono">${esc(o.code)}</td><td>${esc(o.type)}</td>
+  <td>${esc(o.counterparty)}</td><td class="mono">${esc(o.dueDate)}</td><td>${badge(o.status)}</td>
+  <td class="right amt">${money(o.amount)}</td><td class="right" style="color:var(--orange)">${money(o.amount-o.settled)}</td>
+  <td class="right">${o.amount-o.settled>0?`<button class="btn mini" data-act="settle" data-id="${esc(o.id)}" data-val="${o.amount-o.settled}">结清</button>`:'—'}</td></tr>`).join(''));
+}
+async function pCustomers(){
+ const rows=await api('/v1/master/customers');
+ return `<div class="toolbar">${searchBox('customers','搜索客户')}<div class="spacer"></div><span class="note">共 ${rows.length} 家</span></div>`+
+ table([{t:'编码'},{t:'客户名称'},{t:'联系人'},{t:'电话'},{t:'城市'},{t:'级别'},{t:'应收',right:true}],
+  rows.map(c=>`<tr data-search="${esc(c.name+c.contact)}"><td class="mono">${esc(c.id)}</td><td>${esc(c.name)}</td>
+  <td>${esc(c.contact)}</td><td class="mono">${esc(c.phone)}</td><td>${esc(c.city)}</td><td>${badge(c.level==='战略客户'?'已完成':c.level==='重要客户'?'已确认':'草稿')}</td>
+  <td class="right amt">${money(c.receivable)}</td></tr>`).join(''));
+}
+async function pSuppliers(){
+ const rows=await api('/v1/master/suppliers');
+ return `<div class="toolbar">${searchBox('suppliers','搜索供应商')}<div class="spacer"></div><span class="note">共 ${rows.length} 家</span></div>`+
+ table([{t:'编码'},{t:'供应商'},{t:'联系人'},{t:'电话'},{t:'分类'},{t:'评级'},{t:'应付',right:true}],
+  rows.map(s=>`<tr data-search="${esc(s.name+s.contact)}"><td class="mono">${esc(s.id)}</td><td>${esc(s.name)}</td>
+  <td>${esc(s.contact)}</td><td class="mono">${esc(s.phone)}</td><td>${esc(s.category)}</td>
+  <td style="color:var(--orange)">${'★'.repeat(s.rating)}</td><td class="right amt">${money(s.payable)}</td></tr>`).join(''));
+}
+async function pProducts(){
+ const rows=await api('/v1/master/products');
+ return `<div class="toolbar">${searchBox('products','搜索商品或 SKU')}<div class="spacer"></div><span class="note">共 ${rows.length} 个商品</span></div>`+
+ table([{t:'SKU'},{t:'商品名称'},{t:'分类'},{t:'售价',right:true},{t:'成本',right:true},{t:'库存',right:true},{t:'安全库存',right:true},{t:'状态'}],
+  rows.map(p=>`<tr data-search="${esc(p.name+p.sku)}"><td class="mono">${esc(p.sku)}</td><td>${esc(p.name)}</td>
+  <td>${esc(p.category)}</td><td class="right amt">${money(p.price)}</td><td class="right">${money(p.cost)}</td>
+  <td class="right amt">${num(p.stock)}</td><td class="right">${num(p.safetyStock)}</td>
+  <td>${p.stock<=p.safetyStock?badge('已逾期'):badge('已完成')}</td></tr>`).join(''));
+}
+async function pReports(){
+ const d=await api('/v1/reports/overview');const s=state.filters.reportSeries||'销售';
+ const pts=s==='销售'?d.salesTrend:d.purchaseTrend;
+ return `<div class="chips"><button class="chip ${s==='销售'?'on':''}" data-act="filter" data-key="reportSeries" data-val="销售">销售趋势</button>
+  <button class="chip ${s==='采购'?'on':''}" data-act="filter" data-key="reportSeries" data-val="采购">采购趋势</button></div>
+  <div class="card"><h3>${s}趋势<small>近 12 个月 · 单位：万元</small></h3>${bars(pts,s==='采购'?'#7b5ce8':'#2466eb')}</div>
+  <div class="grid2"><div class="card"><h3>销售品类占比</h3><div style="display:flex;gap:20px;align-items:center">${donut(d.categoryShare)}${legend(d.categoryShare)}</div></div>
+  <div class="card"><h3>库存分布</h3><div style="display:flex;gap:20px;align-items:center">${donut(d.warehouseShare)}${legend(d.warehouseShare)}</div></div></div>`;
+}
+async function pApiDocs(){
+ const m=await api('/v1/meta');
+ const groups={};m.endpoints.forEach(e=>(groups[e.group]=groups[e.group]||[]).push(e));
+ return `<div class="card"><h3>服务信息</h3><div class="rowline"><span>版本</span><span>${esc(m.version)}</span></div>
+  <div class="rowline"><span>鉴权</span><span>${m.authRequired?'会话鉴权已启用':'未启用'}</span></div>
+  <div class="rowline"><span>Base URL</span><span><code>${esc(state.base)}</code></span></div>
+  <div class="rowline"><span>服务器时间</span><span>${esc(m.time)}</span></div></div>
+  ${Object.entries(groups).map(([g,list])=>`<div class="card"><h3>${esc(g)}</h3>
+   <div class="mono-list">${list.map(e=>`<div><span class="badge ${e.method==='GET'?'b-info':e.method==='POST'?'b-ok':'b-purple'}">${e.method}</span>
+   &nbsp;<code>${esc(e.path)}</code> &nbsp;<span style="color:var(--t2)">${esc(e.desc)}</span></div>`).join('')}</div></div>`).join('')}`;
+}
+async function pSettings(){
+ const h=await api('/health');
+ let me={};try{me=JSON.parse(localStorage.getItem('erp_user')||'{}')}catch(e){}
+ let users=[];try{users=await api('/v1/auth/users')}catch(e){}
+ const admin=me.role==='admin';
+ const userRows=users.map(u=>'<div class="rowline"><span>'+esc(u.username)+' · '+esc(u.displayName)+' · '+(u.role==='admin'?'管理员':'普通用户')+(u.enabled?'':'（已停用）')+'</span><span>'+(u.username==='admin'?'—':'<button class="btn mini" data-act="toggle-user" data-val="'+esc(u.username)+'" data-arg="'+(u.enabled?'0':'1')+'">'+(u.enabled?'停用':'启用')+'</button>')+'</span></div>').join('');
+ return `<div class="grid2"><div class="card"><h3>服务状态</h3>
+  <div class="rowline"><span>状态</span><span style="color:var(--green)">● ${esc(h.status)}</span></div>
+  <div class="rowline"><span>服务</span><span>${esc(h.service)} v${esc(h.version)}</span></div>
+  <div class="rowline"><span>鉴权</span><span>已启用（会话 Token）</span></div>
+  <div class="rowline"><span>数据记录</span><span>销售 ${h.records.sales} · 采购 ${h.records.purchases} · 库存 ${h.records.inventory} · 工单 ${h.records.workOrders} · 往来 ${h.records.invoices}</span></div>
+  <div class="rowline"><span>服务器时间</span><span>${esc(h.time)}</span></div></div>
+  <div class="card"><h3>当前账号</h3>
+  <div class="rowline"><span>用户名</span><span>${esc(me.username||'—')}</span></div>
+  <div class="rowline"><span>显示名</span><span>${esc(me.displayName||'—')}</span></div>
+  <div class="rowline"><span>角色</span><span>${me.role==='admin'?'管理员':'普通用户'}</span></div>
+  ${me.mustChangePassword?'<div class="alert" style="margin-top:12px">⚠ 首次登录，请立即修改初始密码</div>':''}
+  <div class="note" style="margin-top:10px">登录会话有效期由服务端 config.json 的 auth.sessionHours 控制（默认 8 小时）。</div></div></div>
+  <div class="card"><h3>账号安全<small>修改密码后需要重新登录</small></h3>
+  <label class="fl">原密码</label><input class="field" id="pw-old" type="password" placeholder="当前密码">
+  <div style="display:flex;gap:10px"><div style="flex:1"><label class="fl">新密码（至少 8 位）</label><input class="field" id="pw-new" type="password"></div>
+  <div style="flex:1"><label class="fl">确认新密码</label><input class="field" id="pw-new2" type="password"></div></div>
+  <button class="btn primary" data-act="change-password">修改密码</button></div>
+  ${admin?`<div class="card"><h3>用户管理<small>仅管理员可见</small></h3>${userRows}
+  <h3 style="margin-top:18px;font-size:13px">新建账号</h3>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+   <input class="field" style="flex:1;min-width:130px" id="nu-name" placeholder="用户名">
+   <input class="field" style="flex:1;min-width:130px" id="nu-display" placeholder="显示名">
+   <input class="field" style="flex:1;min-width:130px" id="nu-pwd" type="password" placeholder="密码（≥8 位）">
+  </div><button class="btn primary" data-act="add-user">新建账号</button></div>`:''}
+  <div class="card"><h3>数据管理</h3><div class="note">清空全部业务数据，此操作不可撤销。</div>
+  <button class="btn" style="margin-top:10px;color:var(--red)" data-act="reset-data">清空全部数据</button></div>
+  <div class="card"><h3>iOS App 联云配置</h3><div class="note">
+  在 iPhone App 中打开「我的 → 配置云服务器」，填入：<br>
+  Base URL：<code>${esc(state.base)}</code><br>
+  启用云服务后 App 会先弹出登录页，用本后台的账号密码登录即可。<br>
+  注意：手机需能访问该地址（公网 IP 或同一局域网），且腾讯云安全组需放行服务端口。</div></div>`;
+}
+const PAGES={dashboard:pDashboard,sales:pSales,purchases:pPurchases,inventory:pInventory,movements:pMovements,outbound:pOutbound,
+ production:pProduction,finance:pFinance,customers:pCustomers,suppliers:pSuppliers,products:pProducts,
+ reports:pReports,apidocs:pApiDocs,settings:pSettings};
+
+// ---------- 渲染 ----------
+function renderNav(){
+ $('nav').innerHTML=NAV.map(g=>`<h4>${g[0]}</h4>${g[1].map(x=>
+  `<button class="${state.page===x[0]?'on':''}" data-go="${x[0]}"><span class="ic">${x[2]}</span><span>${x[1]}</span></button>`).join('')}`).join('');
+ const t=TITLES[state.page]||{title:'',sub:''};
+ $('pageTitle').textContent=t.title;$('pageSub').textContent=t.sub;
+ let cu={};try{cu=JSON.parse(localStorage.getItem('erp_user')||'{}')}catch(e){}
+ $('authPill').textContent='👤 '+(cu.displayName||cu.username||'未登录')+(cu.role==='admin'?'（管理员）':cu.role?'（普通用户）':'');
+ $('srvAddr').textContent=state.base;
+}
+async function render(){
+ renderNav();$('view').innerHTML='<div class="loading">加载中...</div>';
+ try{$('view').innerHTML=await PAGES[state.page]();applySearch();}
+ catch(e){$('view').innerHTML=`<div class="err"><b>无法加载数据</b><br>${esc(e.message)}<br><br>
+  请确认服务已启动，且设置页中的 Token 与服务端 config.json 一致。</div>`;}
+}
+async function health(){
+ try{const h=await api('/health');$('healthDot').className='dot';$('healthText').textContent='服务在线 · v'+h.version;}
+ catch(e){$('healthDot').className='dot off';$('healthText').textContent='服务离线';}
+}
+function go(p){state.page=p;render();}
+function openModal(html){$('sheet').innerHTML=html;$('modal').classList.add('show');}
+function closeModal(){$('modal').classList.remove('show');}
+
+async function showDetail(kind,id){
+ const path=kind==='sales'?'/v1/sales-orders/':'/v1/purchase-orders/';
+ const o=await api(path+id);
+ openModal(`<h3>${kind==='sales'?'销售订单':'采购订单'}详情</h3>
+  <div class="rowline"><span>单号</span><span class="mono">${esc(o.code)}</span></div>
+  <div class="rowline"><span>${kind==='sales'?'客户':'供应商'}</span><span>${esc(kind==='sales'?o.customerName:o.supplierName)}</span></div>
+  <div class="rowline"><span>状态</span><span>${badge(o.status)}</span></div>
+  <div class="rowline"><span>日期</span><span>${esc(o.date)}</span></div>
+  ${kind==='purchase'?`<div class="rowline"><span>预计到货</span><span>${esc(o.eta)}</span></div>`:''}
+  <div class="rowline"><span>负责人 / 部门</span><span>${esc(o.owner)}</span></div>
+  <div class="rowline"><span>总金额</span><span style="font-weight:700;color:var(--brand)">${money(o.amount)}</span></div>
+  ${kind==='sales'?`<div class="rowline"><span>备注</span><span>${esc(o.remark||'无')}</span></div>`:''}
+  <h3 style="margin:16px 0 8px;font-size:13px">商品明细</h3>
+  ${o.items.map(i=>`<div class="rowline"><span>${esc(i.productName)} · ${i.quantity} × ${money(i.unitPrice)}</span><span>${money(i.quantity*i.unitPrice)}</span></div>`).join('')}
+  <div style="margin-top:18px;text-align:right"><button class="btn" data-act="close-modal">关闭</button></div>`);
+}
+async function showStatus(kind,id){
+ const isSales=kind==='sales';
+ const path=(isSales?'/v1/sales-orders/':'/v1/purchase-orders/')+id;
+ const o=await api(path);
+ const opts=isSales?['草稿','待审核','已确认','发货中','已完成','已取消']:['草稿','待审批','已下单','到货中','已入库','已取消'];
+ openModal(`<h3>变更状态</h3><div class="note" style="margin-bottom:14px">${esc(o.code)} · 当前状态 ${badge(o.status)}</div>
+  <div class="chips">${opts.map(s=>`<button class="chip ${s===o.status?'on':''}" data-act="set-status" data-kind="${kind}" data-id="${esc(id)}" data-val="${s}">${s}</button>`).join('')}</div>
+  <div style="margin-top:18px;text-align:right"><button class="btn" data-act="close-modal">关闭</button></div>`);
+}
+function showNewOrder(){
+ openModal(`<h3>新建销售订单</h3>
+  <label class="fl">客户名称（必填）</label><input class="field" id="f-customer" placeholder="例如：华为技术有限公司">
+  <label class="fl">商品名称</label><input class="field" id="f-product" value="工业传感器 IS-200">
+  <div style="display:flex;gap:10px"><div style="flex:1"><label class="fl">数量</label><input class="field" id="f-qty" value="10"></div>
+  <div style="flex:1"><label class="fl">单价</label><input class="field" id="f-price" value="1280"></div></div>
+  <label class="fl">备注</label><input class="field" id="f-remark" placeholder="选填">
+  <div style="margin-top:16px;text-align:right"><button class="btn" data-act="close-modal" style="margin-right:8px">取消</button>
+  <button class="btn primary" data-act="submit-order">保存草稿</button></div>`);
+}
+
+// ---------- 事件 ----------
+document.addEventListener('click',async e=>{
+ const g=e.target.closest('[data-go]');if(g){go(g.dataset.go);return;}
+ const b=e.target.closest('[data-act]');if(!b)return;
+ const a=b.dataset.act,kind=b.dataset.kind,id=b.dataset.id,val=b.dataset.val,key=b.dataset.key,arg=b.dataset.arg;
+ if(a==='refresh'){render();health();return;}
+ if(a==='close-modal'){closeModal();return;}
+ if(a==='ob-search'){await render();toast('已完成查找');return;}
+ if(a==='ob-reset'){state.ob={q:'',warehouse:'',date_from:'',date_to:'',operator:'',sku:''};await render();return;}
+ if(a==='ob-export'){if(!state.obResult||!state.obResult.items.length){toast('当前没有可导出的记录');return;}
+   obCsv();toast('已导出 '+state.obResult.items.length+' 条出库记录');return;}
+ if(a==='ob-new'){try{await showOutboundForm()}catch(err){toast(err.message)}return;}
+ if(a==='ob-submit'){
+   const sku=$('ob-sku').value,qty=Number($('ob-qty').value);
+   if(!sku||qty<1){toast('请选择商品并填写有效数量');return;}
+   try{const r=await post('/v1/inventory/outbound',{sku:sku,quantity:qty,
+      warehouse:$('ob-wh').value.trim(),receiver:$('ob-receiver').value.trim(),
+      note:$('ob-note').value.trim(),date:$('ob-date').value});
+    closeModal();await render();toast(r.message||'出库已登记');}
+   catch(err){toast(err.message)}return;}
+ if(a==='ob-photo'){openModal(`<h3>出库凭证</h3><img src="${esc(val)}" style="width:100%;border-radius:10px" alt="出库照片">
+   <div style="margin-top:14px;text-align:right"><button class="btn" data-act="close-modal">关闭</button></div>`);return;}
+ if(a==='filter'){state.filters[key]=val;render();return;}
+ if(a==='new-order'){showNewOrder();return;}
+ if(a==='detail'){try{await showDetail(kind,id)}catch(err){toast(err.message)}return;}
+ if(a==='status'){try{await showStatus(kind,id)}catch(err){toast(err.message)}return;}
+ if(a==='set-status'){try{
+   await patch((kind==='sales'?'/v1/sales-orders/':'/v1/purchase-orders/')+id+'/status',{status:val});
+   closeModal();await render();toast('状态已更新为「'+val+'」');}catch(err){toast(err.message)}return;}
+ if(a==='adjust'){try{await post('/v1/inventory/items/'+id+'/adjust',{delta:Number(val)});
+   await render();toast('库存已调整，已写入出入库流水');}catch(err){toast(err.message)}return;}
+ if(a==='report'){try{await patch('/v1/work-orders/'+id+'/progress',{doneQty:Number(val)});
+   await render();toast('报工成功');}catch(err){toast(err.message)}return;}
+ if(a==='settle'){try{await post('/v1/invoices/'+id+'/settle',{amount:Number(val)});
+   await render();toast('已登记结清');}catch(err){toast(err.message)}return;}
+ if(a==='submit-order'){
+   const name=$('f-customer').value.trim();if(!name){toast('请填写客户名称');return;}
+   const qty=Math.max(1,parseInt($('f-qty').value)||1),price=Math.max(0,parseFloat($('f-price').value)||0);
+   try{await post('/v1/sales-orders',{customerName:name,status:'草稿',owner:(function(){try{var c=JSON.parse(localStorage.getItem('erp_user')||'{}');return c.displayName||c.username||'—'}catch(e){return '—'}})(),
+     remark:$('f-remark').value,items:[{productName:$('f-product').value,quantity:qty,unitPrice:price}]});
+    closeModal();state.page='sales';await render();toast('订单草稿已保存到服务器');}
+   catch(err){toast(err.message)}return;}
+ if(a==='save-token'){
+   state.token=$('cfg-token').value.trim();localStorage.setItem('erp_token',state.token);
+   renderNav();await health();await render();toast('Token 已保存');return;}
+ if(a==='logout'){
+   if(!confirm('确定退出登录？'))return;
+   try{await post('/v1/auth/logout',{})}catch(e){}
+   localStorage.removeItem('erp_session');localStorage.removeItem('erp_user');
+   location.replace('login.html');return;}
+ if(a==='change-password'){
+   const o=$('pw-old').value,n=$('pw-new').value,n2=$('pw-new2').value;
+   if(n.length<8){toast('新密码至少 8 位');return;}
+   if(n!==n2){toast('两次输入的新密码不一致');return;}
+   try{await post('/v1/auth/password',{oldPassword:o,newPassword:n});
+    localStorage.removeItem('erp_session');localStorage.removeItem('erp_user');
+    toast('密码已修改，请重新登录');setTimeout(()=>location.replace('login.html'),900);}
+   catch(err){toast(err.message)}return;}
+ if(a==='add-user'){
+   const name=$('nu-name').value.trim(),pw=$('nu-pwd').value,disp=$('nu-display').value.trim();
+   if(!name||pw.length<8){toast('请填写用户名，密码至少 8 位');return;}
+   try{await post('/v1/auth/users',{username:name,displayName:disp||name,password:pw,role:'user'});
+    await render();toast('账号已创建');}catch(err){toast(err.message)}return;}
+ if(a==='toggle-user'){
+   try{await patch('/v1/auth/users/'+val,{enabled:arg==='1'});await render();toast('账号状态已更新');}
+   catch(err){toast(err.message)}return;}
+ if(a==='reset-data'){
+   if(!confirm('确定清空全部数据？此操作不可撤销。'))return;
+   try{await post('/v1/admin/reset',{});await render();toast('数据已清空');}catch(err){toast(err.message)}return;}
+});
+document.addEventListener('input',e=>{
+ if(e.target.dataset.obKey!==undefined){state.ob[e.target.dataset.obKey]=e.target.value;return;}
+ if(e.target.dataset.searchKey){state.queries[e.target.dataset.searchKey]=e.target.value;
+  const q=e.target.value.trim().toLowerCase();
+  document.querySelectorAll('#view [data-search]').forEach(el=>{
+   el.style.display=(!q||el.dataset.search.toLowerCase().includes(q))?'':'none';});}
+});
+document.addEventListener('change',e=>{
+ if(e.target.dataset.obKey!==undefined)state.ob[e.target.dataset.obKey]=e.target.value;
+});
+$('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal();});
+render();health();setInterval(health,15000);
+</script>
+</body>
+</html>
